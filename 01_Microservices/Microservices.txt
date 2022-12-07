@@ -1,0 +1,39 @@
+==================
+Before Microservices
+==================
+1. Monolithic architecture: Mulitple components are combined in single large app.
+2. Single Code Base
+3. Deployed in single bundle
+4. Drawbacks:- Change in one service then whole app is redeployed.
+5. Building Problem:- Developers has to communicate
+6. Problem in Scale(large codebase)
+7. Cumbersome(extreme tedious) over time.
+
+==================
+Microservices
+==================
+1. Large apps are divide into small parts.
+2. Different Codebase
+3. Each module managed independently
+4. Different tech stack
+5. Drawback:- Handling microservices is complex.
+
+==================
+What we are going to build to Master Microservices
+==================
+
+1. We are creating three services :- Hotel Service, User Service, Rating Service
+2. All 3 Services will use three different database for themselves.
+3. We are using github config server in config service.
+4. Client will directly communicate with api gateway and then services.
+5. Providing Authentication with OKTA Auth.
+6. We have to register all these servies in ServiceRegistery Services where all services are centrallized.
+7. All Services will run at different port at runtime parallely on service registry.
+
+===================
+Creating User Microservice with storing data in MySQL database
+===================
+
+===================
+Creating Hotel Microservice with storing data in PostgreSQL database
+===================
