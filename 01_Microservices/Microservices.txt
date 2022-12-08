@@ -38,7 +38,6 @@ Creating User Microservice with storing data in MySQL database
 Creating Hotel Microservice with storing data in PostgreSQL database
 ===================
 
-
 ===================
 Creating Rating Microservice with storing data in MongoDB database
 ===================
