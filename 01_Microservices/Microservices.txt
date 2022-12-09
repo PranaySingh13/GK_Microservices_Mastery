@@ -95,3 +95,5 @@ eureka.instance.prefer-ip-address=true
 eureka.client.register-with-eureka=true
 eureka.client.fetch-registry=true
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+	8.3 Similarly we have to discover Hotel Service and Rating Service as Eureka Client Service.
