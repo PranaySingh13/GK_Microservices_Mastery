@@ -41,3 +41,57 @@ Creating Hotel Microservice with storing data in PostgreSQL database
 ===================
 Creating Rating Microservice with storing data in MongoDB database
 ===================
+
+===================
+Implementing Serivce Registration(Eureka Service) and Discovery Client
+===================
+Definitions
+
+Eureka Server
+Eureka Server is also known as Discovery Server. It contains a registry of services and a REST api that can be used to register a service, deregister a service and knows all the client applications running on each port and IP address.
+
+Eureka Service
+Any application that can be found in the Eureka Server's registry and is discoverable by others. A service has a logical identifier called a "service id", that can refer to one or more instances of the same application.
+
+Eureka Instance
+Any application that registers itself with the Eureka Server to be discovered by others.
+
+Eureka Client
+Any application that can discover services
+
+1. It will walkthrough you through the process of starting and using the Netflix Eureka service registry.
+	1.1 It will track all the information of services.
+
+2. We will set up a Netflix Eureka service registry and then build a client that both registers itself with the registry and uses it to resolve its own host.
+	2.1 Add dependencies for Cloud Bootstrap and Eureka Server for the service application and Cloud Bootstrap, Eureka Server and Eureka Discovery Client for the client application.
+	2.2 Spring Boot provides a Spring Boot Starter for a Eureka Server.
+	2.3 Spring Boot also provides a starter for Eureka clients.
+
+3. We first need a Eureka Service registry. We can use Spring Cloud’s @EnableEurekaServer to stand up a registry with which other applications can communicate. This is a regular Spring Boot application with one annotation (@EnableEurekaServer) added to enable the service registry in main Application at class level.
+
+4. When the registry starts, it will complain (with a stacktrace) that there are no replica nodes to which the registry can connect. In a production environment, you will want more than one instance of the registry.For our simple purposes, however, it suffices to disable the relevant logging.
+
+5. By default, the registry also tries to register itself, so you need to disable that behavior as well.
+
+6. It is a good convention to put this registry on a separate port when using it locally.
+
+7. Add some properties to eureka-service/src/main/resources/application.properties to handle all of these requirements, as the following listing shows:
+
+server.port=8761
+
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
+
+logging.level.com.netflix.eureka=OFF
+logging.level.com.netflix.discovery=OFF
+
+8. Now that we have started a service registry, we can stand up a client that both registers itself with the registry and uses the Spring Cloud DiscoveryClient abstraction to interrogate the registry for its own host and port. The @EnableDiscoveryClient activates the Netflix Eureka DiscoveryClient implementation.
+	8.1 Discovery client service concept in spring cloud is implemented in different ways like Eureka, consul, zookeeper etc. If you are using Eureka by Netflix then @EnableEurekaClient is specifically for that. But if you are using any other service discovery including Eureka you can use @EnableDiscoveryClient.
+	8.2 Add some properties to application.properties to handle all of these requirements, as the following listing shows:
+
+spring.application.name=USER-SERVICE
+
+eureka.instance.prefer-ip-address=true
+eureka.client.register-with-eureka=true
+eureka.client.fetch-registry=true
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
