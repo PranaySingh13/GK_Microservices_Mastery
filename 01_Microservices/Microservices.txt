@@ -149,3 +149,35 @@ across all servers capable of fulfilling those requests in a manner that maximiz
 utilization and ensures that no one server is overworked, which could degrade performance.
 
 Therefore, we applied @LoadBalanced annotation at our RestTemplate Bean created in config class.
+
+====================
+Feign Client
+====================
+1. Feign is a declarative web service client developed by Netflix.
+2. It makes writing web service clients easier.
+3. If you want to use Feign,create an interface and annotate it with @FeignClient.
+4. It has pluggable annotation support including Feign annotations and JAX-RS annotations. Feign also supports pluggable encoders and decoders.
+5. Spring Cloud adds support for Spring MVC annotations and for using the same HttpMessageConverters used by default in Spring Web.
+6. Spring Cloud integrates Eureka, Spring Cloud CircuitBreaker, as well as Spring Cloud LoadBalancer to provide a load-balanced http client when using Feign.
+7. To include Feign in your project use the starter with group org.springframework.cloud and artifact id spring-cloud-starter-openfeign to our pom.xml file.
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+
+8. Next, we need to add @EnableFeignClients to our main class.
+9. Next, create an interface HotelService and annotate it with @FeignClient.
+10. Inject the HotelService interface in UserServiceImpl to use its methods.
+11. The load-balancer client above will want to discover the physical addresses for the "HOTEL-SERVICE" service. 
+If your application is a Eureka client then it will resolve the service in the Eureka service registry. 
+If you don’t want to use Eureka, you can configure a list of servers in your external configuration using SimpleDiscoveryClient.
+
+@FeignClient(name = "HOTEL-SERVICE")
+public interface HotelService {
+
+	@GetMapping("/api/hotels/hotel/{hotelId}")
+	Hotel getHotel(@PathVariable String hotelId);
+}
+
+12. As per requirement, we can POST,PUT,DELETE,GET HTTP Calls of multiple discovery client services with the help of Feign Client.
+
