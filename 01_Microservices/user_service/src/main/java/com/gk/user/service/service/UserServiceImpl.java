@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow(() -> new ResourceNotFoundException("User not found with id" + userId));
 
 		// fetch rating of the above user from rating service
-		Rating[] ratingsOfUser = restTemplate.getForObject("http://localhost:8083/api/ratings/user/" + userId,
+		Rating[] ratingsOfUser = restTemplate.getForObject("http://RATING-SERVICE/api/ratings/user/" + userId,
 				Rating[].class);
 		List<Rating> ratings = Arrays.stream(ratingsOfUser).collect(Collectors.toList());
 
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
 			// api call to hotel service to get the hotel
 			// http://localhost:8082/api/hotels/hotel/59db9bc3-9eb4-4f11-b6fe-c91d6078cb6d
 			ResponseEntity<Hotel> forEntity = restTemplate
-					.getForEntity("http://localhost:8082/api/hotels/hotel/" + rating.getHotelId(), Hotel.class);
+					.getForEntity("http://HOTEL-SERVICE/api/hotels/hotel/" + rating.getHotelId(), Hotel.class);
 			Hotel hotel = forEntity.getBody();
 			logger.info("Response status code {}", forEntity.getStatusCode());
 
