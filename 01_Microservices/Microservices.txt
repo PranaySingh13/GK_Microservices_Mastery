@@ -97,3 +97,39 @@ eureka.client.fetch-registry=true
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka
 
 	8.3 Similarly we have to discover Hotel Service and Rating Service as Eureka Client Service.
+	8.4 The eureka-client will take about a minute to register itself in the registry and to refresh its own list of registered instances from the registry.
+
+=======================
+How Microservices Communicate with each other ?
+=======================
+1. With the help of RestTemplate Class.
+2. As of Spring Framework 5, alongside the WebFlux stack, Spring introduced a new HTTP client called WebClient.
+3. WebClient is a modern, alternative HTTP client to RestTemplate. Not only does it provide a traditional synchronous API, but it also supports an efficient nonblocking and asynchronous approach.
+4. That said, if we're developing new applications or migrating an old one, it's a good idea to use WebClient. Moving forward, RestTemplate will be deprecated in future versions.
+5. First we will create a Bean of RestTemplate .
+6. As per business, fetch ratings of the user in user service from rating-service with help of Rest Template Methods.
+7. Calling Two Microservices Together rating service and hotel service.
+Example Response:- 
+
+{
+    "userId": "65bf5d73-7498-459f-9be3-572a89bafd70",
+    "name": "Pranay Singh",
+    "email": "pranay@gmail.com",
+    "about": "Software Engineer",
+    "ratings": [
+        {
+            "ratingId": "2aa3d51a-dc24-48d9-a738-b3a5e5afe7a5",
+            "userId": "65bf5d73-7498-459f-9be3-572a89bafd70",
+            "hotelId": "59db9bc3-9eb4-4f11-b6fe-c91d6078cb6d",
+            "rating": 9,
+            "feedback": "This is one of the top hotels in india in terms of food and hospitality.",
+            "hotel": {
+                "id": "59db9bc3-9eb4-4f11-b6fe-c91d6078cb6d",
+                "name": "Hotel Sayaji",
+                "location": "Indore",
+                "about": "Very good food and services"
+            }
+        }
+    ]
+}
+

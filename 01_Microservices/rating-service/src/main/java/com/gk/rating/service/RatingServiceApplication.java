@@ -12,4 +12,5 @@ public class RatingServiceApplication {
 		SpringApplication.run(RatingServiceApplication.class, args);
 	}
 
+
 }
