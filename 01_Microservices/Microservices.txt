@@ -182,8 +182,10 @@ public interface HotelService {
 12. As per requirement, we can POST,PUT,DELETE,GET HTTP Calls of multiple discovery client services with the help of Feign Client.
 
 ====================
-What is the use of an API Gateway in Microservices ?
+Spring Cloud API Gateway
 ====================
+What is the use of an API Gateway in Microservices ?
+
 1. If we divide API services that we could use in here with depending on that we used microservices based architecture,
 there will be 4 main services to consume in order to load a view,
 Ex: 
@@ -202,3 +204,84 @@ There are two ways of calling those APIS.
 	1.2 API gateway microservice communication. – This is the most common practice in building communication between clients to service in microservices. 
 	In API Gateway there will be a single entry point to access services, and It encapsulates the internal system and return an API that tailored for clients.
 	
+=====================
+Implementing Spring Cloud API Gateway
+=====================
+1. If you are building an API gateway for your own project, Just add the following libraries and create a spring boot application.
+Add dependencies for Cloud Bootstrap, Eureka Discovery Client,Gateway and Spring Reactive Web from Spring Initializer.
+
+2. Next, we need to add @EnableEurekaClient to our main class.
+
+3. Next, Then add configurations to connect with the service registry.
+
+server.port=8084
+spring.application.name=API-GATEWAY
+
+eureka.instance.prefer-ip-address=true
+eureka.client.register-with-eureka=true
+eureka.client.fetch-registry=true
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+4. Next, Configuring API Gateway Routes With Spring Cloud Gateway.
+	4.1 As I discussed earlier on Service Registration and Discovery With Spring Cloud Netflix Eureka for the moment we have enabled service discovery for this service collection. Hence we can use that discovery capability to build routing inside the microservice ecosystem using spring cloud gateway.
+	4.2 when a client sends a request to the API gateway, It will discover the correct service IP and PORT using the service registry to communicate and route the request.
+ 	4.3 So just add following configurations in to the API gateway application properties for all discovery client services.
+
+##GATEWAY CONFIGURATIONS
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      routes:
+
+## USER SERVICE
+      - id: USER-SERVICE
+        uri: lb://USER-SERVICE
+        predicates:
+        - Path= /api/users/
+
+	4.4 lb in uri indicates that our client services are load balanced.
+	4.5 If you are using application.properties define all the routes as below,
+
+spring.cloud.gateway.routes[0].id=user-service
+spring.cloud.gateway.routes[0].uri=lb://user-service
+spring.cloud.gateway.routes[0].predicates[0]=Path=/api/users/**
+spring.cloud.gateway.routes[0].filters[0]=StripPrefix=1
+
+	4.6 What are the properties that we set for API gateway routes ?
+		4.6.1 id – This is just an identification of the routes. You are free to use any kind of alphanumeric value here and I’m going to use the service name which I’ve defined in destination service.
+		4.6.2 URI – Here we can use both http://localhost:8081 and lb://user-service, But if we need to use the inbuilt load balancer on Netflix Eureka server, we should use lb://user-service, 
+			Then API registry will takeover the request and show load-balanced request destination to the API gateway.
+		4.6.3 predicates – In here we can set multiple paths to identify a correct routing destination.
+		4.6.4 filters – Here, you can modify requests and responses before or after sending the downstream request.
+	4.7 Now we are ready with our API gateway + routing setup.
+
+5. Calling from API Gateway port  
+Example:- 
+Request:- http://localhost:8084/api/users/user/65bf5d73-7498-459f-9be3-572a89bafd70
+
+Response:- 
+{
+    "userId": "65bf5d73-7498-459f-9be3-572a89bafd70",
+    "name": "Pranay Singh",
+    "email": "pranay@gmail.com",
+    "about": "Software Engineer",
+    "ratings": [
+        {
+            "ratingId": "2aa3d51a-dc24-48d9-a738-b3a5e5afe7a5",
+            "userId": "65bf5d73-7498-459f-9be3-572a89bafd70",
+            "hotelId": "59db9bc3-9eb4-4f11-b6fe-c91d6078cb6d",
+            "rating": 9,
+            "feedback": "This is one of the top hotels in india in terms of food and hospitality.",
+            "hotel": {
+                "id": "59db9bc3-9eb4-4f11-b6fe-c91d6078cb6d",
+                "name": "Hotel Sayaji",
+                "location": "Indore",
+                "about": "Very good food and services"
+            }
+        }
+    ]
+}
+
+6. Important:- Refer the document for Spring Cloud Gateway on https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/
