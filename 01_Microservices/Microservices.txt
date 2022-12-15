@@ -285,3 +285,11 @@ Response:-
 }
 
 6. Important:- Refer the document for Spring Cloud Gateway on https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/
+
+7. If we want to configuring multiple url of microservice in API Gateway.
+Ex:- In hotel service ,if there is some other staff service than we have to give the staff service controller url to predicate path attribute in api gateway application.yml
+#HOTEL SERVICE              
+      - id: HOTEL-SERVICE
+        uri: lb://HOTEL-SERVICE
+        predicates:
+        - Path= /api/hotels/**,/api/staffs/**
