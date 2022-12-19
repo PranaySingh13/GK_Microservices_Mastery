@@ -293,3 +293,80 @@ Ex:- In hotel service ,if there is some other staff service than we have to give
         uri: lb://HOTEL-SERVICE
         predicates:
         - Path= /api/hotels/**,/api/staffs/**
+
+===========================
+Centralized Configurations With Spring Cloud Config
+===========================
+1. Spring Cloud Config Server To Centralize Properties for Your Spring Boot Apps.
+2. Spring cloud config is provides externalized configurations for a distributed application.
+3. Here we are setting up a spring cloud configuration server and consume that configuration server with a spring boot microservices project.
+4. Problem and Solution
+	4.1 In microservices architecture there can be hundreds of independent services which has been deployed. 
+	Traditionally we are using environment based config or application level configurations. 
+	It could hard to manage with the growth of the application architecture. 
+	So here we have a approach called centralized configurations where we manage all the application configurations 
+	in a central location and all the services inside the architecture will consume that central location to capture all necessary configurations.
+
+	4.2 In addition to that this could be implemented in a secure way using both application level configs and infrastructure level configurations 
+	to minimize unauthorized access to applications configurations.
+
+	4.3 Here, we set up a spring cloud Configuration Server and configure multiple application properties using GitHub repository, and 
+	connect those with microservices inside a spring boot microservice project using Config Client a Client that connects to a configuration server to fetch the application’s configuration.
+5. Setting Up Spring Cloud Config Server
+This is the base spring boot project which listens to centralized configurations from a given source (Git) and makes responses to incoming configurations request from client microservices. Additionally, the configuration server could load configuration via Git, SVN, or HashiCorp Vault.
+6. Create another spring boot application by adding the following dependencies config server and eureka discovery client.
+7. After that, we need to enable config server capabilities to created spring boot application by adding @EnableConfigServer in the configuration class or in the application main class.
+8. Now there is a requirement of having a Git, SVN, or Hashicorp vault to store our application configurations which we need to configure with this configurations server.
+9. Let’s create a repository and add application configurations of all the microservices inside our architecture. Additionally, this repository could be a private repository or a public repository. I’ll include all the necessary steps to access the private repository with this article.
+10. We just need the repo URL and credentials to access it when it is a private repository.
+11. Few Tips In Creating Centralized Application Configurations
+	11.1 You can choose both .yml or .properties extensions when storing application configurations in spring cloud server.
+	11.2 If you need to create property files for multiple spring boot profiles (DEV/STAGING/PRODUCTION), just create separate configrations file as follows, Here spring cloud config capture profile with value after – inside file name.
+		Ex:- application-dev.yml for Development environment
+		Ex:- application-staging.yml for Staging environment
+		Ex:- application-prod.yml for Production environment
+
+12. Now since we have a configuration server and already defined app configurations in a sharable location, we can focus on configuring this with the spring cloud config server.
+13. Just add the following configurations into the application.yml or application.properties file in spring-cloud-config enabled spring boot application that we have created earlier.
+server:
+  port: 8085
+
+spring:
+  application:
+    name: CONFIG-SERVER
+    
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/PranaySingh13/microservices-configurations.git
+          search-paths: Microservices1_Configurations
+          default-label: master
+
+	13.1 spring.cloud.config.server.git.uri – This is the URL to access github repository which keeps all our application configurations.
+	13.2 spring.cloud.config.server.git.search-paths – Here I’m setting whatever the folder structure that we are keeping where I’ve stored all the configuration in github repository. (Optional)
+	13.3 default-label – Branch that configurations server should check for configurations.
+	13.4 In addition to that if you are using a private repository just use spring.cloud.config.server.git.username and spring.cloud.config.server.git.password to set authentication.
+	13.5 After configuring all the things just start the service as a spring boot application. Then you can check all the things by accessing the following URLs.
+	  Ex:- 	http://localhost:8090/application/default
+		This loads all the configurations inside default property file of config microservice.
+		http://localhost:8090/application/dev
+		This will return all the configuraration under DEV profile along with default profile. In spring boot it will automatically give priority to DEV profile, when run with DEV profile.
+
+14. Now we have a working configuration server, Then let’s focus on configuring microservices to use configuration server in order to load application configurations.
+
+15. Configure Microservices with Config Client
+Let’s focus on how to set up microservices inside our architecture to consume the configurations server and capture all the application properties when deploying the application.
+16. Here I’ll demonstrate the approach with api-gateway and the process is the same for every and each other client service inside the architecture.
+17. After that create bootstrap.yml inside src/main/resources and add the following configurations which this application connect with the configuration server which we have configured earlier.
+spring:
+  cloud:
+    config:
+      uri: http://localhost:8085
+18. Finally, remove all the local configurations from application.yml or application.properties 
+and keep spring.application.name configuration only, This value will be used by the spring cloud config client and resolve configurations using the configuration server.
+spring:
+  application:
+    name: API_GATEWAY
+19. All done now you just need to start both configuration server and API gateway which we have configured.
+Then you can see the following log when running API-gateway. All done and API gateway should start and respond to the requests now.

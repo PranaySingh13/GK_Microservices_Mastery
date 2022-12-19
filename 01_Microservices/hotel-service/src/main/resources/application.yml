@@ -1,0 +1,23 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: HOTEL-SERVICE
+    
+#Database Configuration  
+  datasource:
+    password: root
+    url: jdbc:postgresql://localhost:5432/microservices
+    username: postgres
+    
+#Hibernate-JPA Configuration 
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+    show-sql: true
+
+#No need to add these props as from url spring boot will directly assumes the dialect and driver class name
+#spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+#spring.jpa.properties.hibernate.dialect =org.hibernate.dialect.MySQL8Dialect
