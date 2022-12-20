@@ -107,7 +107,13 @@ How Microservices Communicate with each other ?
 3. WebClient is a modern, alternative HTTP client to RestTemplate. Not only does it provide a traditional synchronous API, but it also supports an efficient nonblocking and asynchronous approach.
 4. That said, if we're developing new applications or migrating an old one, it's a good idea to use WebClient. Moving forward, RestTemplate will be deprecated in future versions.
 5. First we will create a Bean of RestTemplate in our config class.
-6. As per business, fetch ratings of the user in user service from rating-service with help of Rest Template Methods.
+	5.1 To use WebClient add dependencies of Spring Reactive Web from Spring Initializer.
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+    </dependency>
+	5.2 we will create a Bean of WebClient in our config class.
+6. As per business, fetch ratings of the user in user service from rating-service with help of Rest Template Methods or WebClient.
 7. Calling Two Microservices Together rating service and hotel service.
 Example Response:- 
 
@@ -134,13 +140,17 @@ Example Response:-
 }
 
 ====================
-Loadbalance Across Server Instances or Removing Host and Port of Microservices
+Removing Host and Port of Microservices
 ====================
 1. In this, we are replacing hard code url's to dynamic url's so in this case if the host and port changes, the url will break.
 Therefore we are using name of Discovery Client that is register in Discovery Server and replace it will static url's
 ex:- localhost:8081 => USER-SERVICE
 
-2. To create a fault-tolerant system, it's common to run multiple instances of each application.
+====================
+Client Side Load Balancing with Spring Cloud Load Balancer
+====================
+
+1. To create a fault-tolerant system, it's common to run multiple instances of each application.
 Thus, whenever one service needs to communicate with another, it needs to pick a particular instance to send its request.
 Load balancing is the process of distributing traffic among different instances of the same application.
 
@@ -148,7 +158,15 @@ A load balancer acts as the “traffic cop” sitting in front of your servers a
 across all servers capable of fulfilling those requests in a manner that maximizes speed and capacity 
 utilization and ensures that no one server is overworked, which could degrade performance.
 
-Therefore, we applied @LoadBalanced annotation at our RestTemplate Bean created in config class.
+2. Therefore, we applied @LoadBalanced annotation at our RestTemplate Bean created in config class.
+
+3. Spring Cloud Load Balancer follows round-robin pattern i.e; migrating request one by one to every instance of consumer microservice and repeat it.
+Spring Cloud Load Balancer provides a simple round robin rule for load balancing between multiple instances of a single service. 
+Our goal here is to implement a rule, which measures each application response time and gives a weight according to that time. 
+The longer the response time, the less weight it will get.
+
+4. Earlier Spring Provides Spring Cloud Netflix Ribbon but it's deprecated now so we are not going to use this. Therefore, We use the latest one 
+Spring Cloud Load Balancer.
 
 ====================
 Feign Client
@@ -180,6 +198,16 @@ public interface HotelService {
 }
 
 12. As per requirement, we can POST,PUT,DELETE,GET HTTP Calls of multiple discovery client services with the help of Feign Client.
+
+13. Important :- Why we need to go through Open Fiegn Client when we can do the same thing with WebClient ?
+	The main difference is that WebClient supports Reactive calls. You can achieve that with 3rd party feign clients 
+	like https://github.com/Playtika/feign-reactive but basically for a reactive way you should consider using WebClient 
+	with some neat async connector like Jetty. On the other hand, If you want a blocking way(thread-per-request model i.e; 
+	the thread will block until the feign client receives the response. The problem with the blocking code is it must wait until 
+	the consuming thread completes, hence think memory and CPU cycles.) with minimal hassle 
+	then Feign could be your best choice.So use Spring WebClient when needing non-blocking HTTP requests otherwise Feign due 
+	to simple usage model.
+
 
 ====================
 Spring Cloud API Gateway
