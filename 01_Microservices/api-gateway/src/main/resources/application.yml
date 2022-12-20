@@ -5,6 +5,10 @@ server:
 spring:
   application:
     name: API-GATEWAY
+  config:
+    import: optional:configserver://localhost:8085
+  profiles:
+    active: dev   
   cloud:
     gateway:
       routes:

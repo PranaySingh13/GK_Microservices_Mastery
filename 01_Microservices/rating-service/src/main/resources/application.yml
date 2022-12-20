@@ -6,6 +6,10 @@ spring:
       database: microservices
   application:
     name: RATING-SERVICE
+  config:
+    import: optional:configserver://localhost:8085
+  profiles:
+    active: dev   
    
 server:
   port: 8083

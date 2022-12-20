@@ -3,6 +3,10 @@ server:
 spring:
   application:
     name: HOTEL-SERVICE
+  config:
+    import: optional:configserver://localhost:8085
+  profiles:
+    active: dev  
     
 #Database Configuration  
   datasource:

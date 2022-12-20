@@ -312,6 +312,15 @@ Centralized Configurations With Spring Cloud Config
 
 	4.3 Here, we set up a spring cloud Configuration Server and configure multiple application properties using GitHub repository, and 
 	connect those with microservices inside a spring boot microservice project using Config Client a Client that connects to a configuration server to fetch the application’s configuration.
+eureka:
+  instance:
+    ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
 5. Setting Up Spring Cloud Config Server
 This is the base spring boot project which listens to centralized configurations from a given source (Git) and makes responses to incoming configurations request from client microservices. Additionally, the configuration server could load configuration via Git, SVN, or HashiCorp Vault.
 6. Create another spring boot application by adding the following dependencies config server and eureka discovery client.
@@ -358,15 +367,35 @@ spring:
 15. Configure Microservices with Config Client
 Let’s focus on how to set up microservices inside our architecture to consume the configurations server and capture all the application properties when deploying the application.
 16. Here I’ll demonstrate the approach with api-gateway and the process is the same for every and each other client service inside the architecture.
-17. After that create bootstrap.yml inside src/main/resources and add the following configurations which this application connect with the configuration server which we have configured earlier.
+17. First, we should include dependencies Config Client from spring initializer that Client that connects to a Spring Cloud Config Server to fetch the application's configuration.
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-config</artifactId>
+    </dependency>
+
+	17.1 Next, To Import additional config data we will import config server in application.yml file.
+spring:
+  config:
+    import: optional:configserver:http://localhost:8085
+
+18. After that create bootstrap.yml inside src/main/resources and add the following configurations which this application connect with the configuration server which we have configured earlier.
 spring:
   cloud:
     config:
       uri: http://localhost:8085
-18. Finally, remove all the local configurations from application.yml or application.properties 
+19. Finally, remove all the local configurations from application.yml or application.properties .
+eureka:
+  instance:
+    ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
 and keep spring.application.name configuration only, This value will be used by the spring cloud config client and resolve configurations using the configuration server.
 spring:
   application:
     name: API_GATEWAY
-19. All done now you just need to start both configuration server and API gateway which we have configured.
+20. All done now you just need to start both configuration server and API gateway which we have configured.
 Then you can see the following log when running API-gateway. All done and API gateway should start and respond to the requests now.
