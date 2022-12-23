@@ -12,4 +12,9 @@ spring:
     active: dev   
    
 server:
-  port: 8083
+  port: 0
+
+eureka:
+  instance:
+    instance-id: RATING-SERVICE:${spring.application.instance_id:${random.value}}
+

@@ -296,6 +296,9 @@ file of your internal microservice.
 server.port=0
 		10.2.2 Set Unique Instance Id. To help Eureka distinguish multiple instances of your internal microservices, you will need to make your microservice register with Eureka using a unique client instance-id.
 eureka.instance.instance-id=${spring.application.name}:${spring.application.instance_id:${random.value}}
+		10.2.3 Now, start your internal microservices as number of times as number of instances you want to create.
+Ex:- If you need two instance to load balance, start two times internal microservice, you will see in console
+Discovery Client initialized at timestamp 1671829735995 with initial instances count: 2 
 
 11. In WebClientConfig.java, we pass a custom configuration for the LoadBalancer by using the @LoadBalancerClient annotation.
 Ex:- @LoadBalancerClient(name = "HOTEL-SERVICE", configuration = HotelServiceConfiguration.class)
