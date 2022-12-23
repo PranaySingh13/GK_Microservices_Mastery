@@ -15,7 +15,7 @@ import com.gk.user.service.entity.Hotel;
 import com.gk.user.service.entity.Rating;
 import com.gk.user.service.entity.User;
 import com.gk.user.service.exception.ResourceNotFoundException;
-import com.gk.user.service.externalServices.HotelService;
+import com.gk.user.service.feignClients.HotelService;
 import com.gk.user.service.repo.UserRepository;
 
 @Service

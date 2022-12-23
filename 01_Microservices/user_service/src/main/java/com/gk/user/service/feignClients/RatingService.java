@@ -1,4 +1,4 @@
-package com.gk.user.service.externalServices;
+package com.gk.user.service.feignClients;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;

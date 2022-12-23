@@ -150,15 +150,13 @@ ex:- localhost:8081 => USER-SERVICE
 Client Side Load Balancing with Spring Cloud Load Balancer
 ====================
 
-1. To create a fault-tolerant system, it's common to run multiple instances of each application.
+1. To create a fault-tolerant system, it's common to run multiple instances of each application(i.e; same application is running on different port).
 Thus, whenever one service needs to communicate with another, it needs to pick a particular instance to send its request.
 Load balancing is the process of distributing traffic among different instances of the same application.
 
-A load balancer acts as the “traffic cop” sitting in front of your servers and routing client requests 
+2. A load balancer acts as the “traffic cop” sitting in front of your servers and routing client requests 
 across all servers capable of fulfilling those requests in a manner that maximizes speed and capacity 
 utilization and ensures that no one server is overworked, which could degrade performance.
-
-2. Therefore, we applied @LoadBalanced annotation at our RestTemplate Bean created in config class.
 
 3. Spring Cloud Load Balancer follows round-robin pattern i.e; migrating request one by one to every instance of consumer microservice and repeat it.
 Spring Cloud Load Balancer provides a simple round robin rule for load balancing between multiple instances of a single service. 
@@ -167,6 +165,143 @@ The longer the response time, the less weight it will get.
 
 4. Earlier Spring Provides Spring Cloud Netflix Ribbon but it's deprecated now so we are not going to use this. Therefore, We use the latest one 
 Spring Cloud Load Balancer.
+
+5. Next, add dependency cloud loadbalancer from spring initializer in all the client microservice which are calling other consumer microservices.
+Here, We are calling rating and hotel service from user service as per business to get the user who rated on hotels, therefore adding dependency in userservice 
+pom.xml .
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+    </dependency> 
+
+6. Spring RestTemplate as a Load Balancer Client
+	6.1 We can configure a RestTemplate to use a Load-balancer client. To create a load-balanced RestTemplate, create a RestTemplate @Bean and 
+	use the @LoadBalanced qualifier.
+
+@Configuration
+public class MyConfiguration {
+
+    @LoadBalanced
+    @Bean
+    RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+	6.2 A RestTemplate bean is no longer created through auto-configuration. Individual applications must create it.
+
+7. Multiple RestTemplate Objects
+If we want a RestTemplate that is not load-balanced, create a RestTemplate bean and inject it. 
+To access the load-balanced RestTemplate, use the @LoadBalanced qualifier when you create your @Bean.
+
+@Configuration
+public class MyConfiguration {
+
+    @LoadBalanced
+    @Bean
+    RestTemplate loadBalanced() {
+        return new RestTemplate();
+    }
+
+    @Primary
+    @Bean
+    RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+	7.1 Notice the use of the @Primary annotation on the plain RestTemplate declaration in the preceding example to 
+disambiguate the unqualified @Autowired injection.
+
+public class MyClass {
+    
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    @LoadBalanced
+    private RestTemplate loadBalanced;
+
+    public String doOtherStuff() {
+        return loadBalanced.getForObject("http://stores/stores", String.class);
+    }
+
+    public String doStuff() {
+        return restTemplate.getForObject("http://example.com", String.class);
+    }
+}
+
+
+8. Spring WebClient as a Load Balancer Client
+	8.1 You can configure WebClient to automatically use a load-balancer client. To create a load-balanced WebClient, 
+	create a WebClient.Builder @Bean and use the @LoadBalanced qualifier.
+
+@Configuration
+public class MyConfiguration {
+
+    @Bean
+    @LoadBalanced
+    public WebClient.Builder loadBalancedWebClientBuilder() {
+        return WebClient.builder();
+    }
+}
+
+9. Multiple WebClient Objects
+If you want a WebClient that is not load-balanced, create a WebClient bean and inject it. To access the load-balanced WebClient, 
+use the @LoadBalanced qualifier when you create your @Bean.
+
+@Configuration
+public class MyConfiguration {
+
+    @LoadBalanced
+    @Bean
+    WebClient.Builder loadBalanced() {
+        return WebClient.builder();
+    }
+
+    @Primary
+    @Bean
+    WebClient.Builder webClient() {
+        return WebClient.builder();
+    }
+}
+	
+	9.1 Notice the use of the @Primary annotation on the plain RestTemplate declaration in the preceding example to 
+disambiguate the unqualified @Autowired injection.
+
+public class MyClass {
+
+    @Autowired
+    private WebClient.Builder webClientBuilder;
+
+    @Autowired
+    @LoadBalanced
+    private WebClient.Builder loadBalanced;
+
+    public Mono<String> doOtherStuff() {
+        return loadBalanced.build().get().uri("http://stores/stores")
+                        .retrieve().bodyToMono(String.class);
+    }
+
+    public Mono<String> doStuff() {
+        return webClientBuilder.build().get().uri("http://example.com")
+                        .retrieve().bodyToMono(String.class);
+    }
+}
+
+10. Start More Than One Instance of Internal Microservice for restTemplate
+	10.1 To see how load-balancing works with internal Microservice, you will need to start more than one instance of an internal 
+Microservice consumed by RestTemplate. If you have only one instance of internal microservice running, you will not really see how load-balancing works.
+	10.2 To be able to start more than one instance of internal microservice, you will need to make the following two changes in application.properties 
+file of your internal microservice.
+		10.2.1 Set the server port to zero. Setting the server port to zero will help you start each instance of internal microservice on different random ports.
+server.port=0
+		10.2.2 Set Unique Instance Id. To help Eureka distinguish multiple instances of your internal microservices, you will need to make your microservice register with Eureka using a unique client instance-id.
+eureka.instance.instance-id=${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+11. In WebClientConfig.java, we pass a custom configuration for the LoadBalancer by using the @LoadBalancerClient annotation.
+Ex:- @LoadBalancerClient(name = "HOTEL-SERVICE", configuration = HotelServiceConfiguration.class)
+
+12. https://www.baeldung.com/spring-cloud-load-balancer.
+
 
 ====================
 Feign Client
