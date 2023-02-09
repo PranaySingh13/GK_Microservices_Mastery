@@ -7,9 +7,9 @@ spring:
   application:
     name: RATING-SERVICE
   config:
-    import: optional:configserver://localhost:8085
+    import: optional:configserver://localhost:8085/
   profiles:
-    active: dev   
+    active: dev
    
 server:
   port: 0
