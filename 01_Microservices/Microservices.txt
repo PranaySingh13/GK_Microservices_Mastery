@@ -88,6 +88,9 @@ logging.level.com.netflix.discovery=OFF
 8. Now that we have started a service registry, we can stand up a client that both registers itself with the registry and uses the Spring Cloud DiscoveryClient abstraction to interrogate the registry for its own host and port. The @EnableDiscoveryClient activates the Netflix Eureka DiscoveryClient implementation.
 	8.1 Discovery client service concept in spring cloud is implemented in different ways like Eureka, consul, zookeeper etc. If you are using Eureka by Netflix then @EnableEurekaClient is specifically for that. But if you are using any other service discovery including Eureka you can use @EnableDiscoveryClient.
 	8.2 Add some properties to application.properties to handle all of these requirements, as the following listing shows:
+	8.3 On Spring Boot 3.0.0 and Java 17, @EnableEurekaClient is deprecated no need to annotate at springboot main application it is fine 
+	if we add the spring-cloud-starter-netflix-eureka-client dependency in pom and if we have the application name in yml or properties 
+	file it will be registered to Eureka Server.
 
 spring.application.name=USER-SERVICE
 
@@ -96,8 +99,8 @@ eureka.client.register-with-eureka=true
 eureka.client.fetch-registry=true
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka
 
-	8.3 Similarly we have to discover Hotel Service and Rating Service as Eureka Client Service.
-	8.4 The eureka-client will take about a minute to register itself in the registry and to refresh its own list of registered instances from the registry.
+	8.4 Similarly we have to discover Hotel Service and Rating Service as Eureka Client Service.
+	8.5 The eureka-client will take about a minute to register itself in the registry and to refresh its own list of registered instances from the registry.
 
 =======================
 How Microservices Communicate with each other ?
@@ -377,6 +380,9 @@ Implementing Spring Cloud API Gateway
 Add dependencies for Cloud Bootstrap, Eureka Discovery Client,Gateway and Spring Reactive Web from Spring Initializer.
 
 2. Next, we need to add @EnableEurekaClient to our main class.
+	2.1 On Spring Boot 3.0.0 and Java 17, @EnableEurekaClient is deprecated no need to annotate at springboot main application it is fine 
+	if we add the spring-cloud-starter-netflix-eureka-client dependency in pom and if we have the application name in yml or properties 
+	file it will be registered to Eureka Server.
 
 3. Next, Then add configurations to connect with the service registry.
 
@@ -489,7 +495,7 @@ eureka:
 
 5. Setting Up Spring Cloud Config Server
 This is the base spring boot project which listens to centralized configurations from a given source (Git) and makes responses to incoming configurations request from client microservices. Additionally, the configuration server could load configuration via Git, SVN, or HashiCorp Vault.
-6. Create another spring boot application by adding the following dependencies config server and eureka discovery client.
+6. Create another spring boot application by adding the following dependencies config server and eureka discovery client from spring initializer.
 7. After that, we need to enable config server capabilities to created spring boot application by adding @EnableConfigServer in the configuration class or in the application main class.
 8. Now there is a requirement of having a Git, SVN, or Hashicorp vault to store our application configurations which we need to configure with this configurations server.
 9. Let’s create a repository and add application configurations of all the microservices inside our architecture. Additionally, this repository could be a private repository or a public repository. I’ll include all the necessary steps to access the private repository with this article.
@@ -533,7 +539,7 @@ spring:
 15. Configure Microservices with Config Client
 Let’s focus on how to set up microservices inside our architecture to consume the configurations server and capture all the application properties when deploying the application.
 16. Here I’ll demonstrate the approach with api-gateway and the process is the same for every and each other client service inside the architecture.
-17. First, we should include dependencies Config Client from spring initializer that Client that connects to a Spring Cloud Config Server to fetch the application's configuration.
+17. First, we should include dependencies Config Client from spring initializer into the Client including api-gateway that connects to a Spring Cloud Config Server to fetch the application's configuration.
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-config</artifactId>
@@ -549,6 +555,7 @@ spring:
   cloud:
     config:
       uri: http://localhost:8085
+	
 19. Finally, remove all the local configurations from application.yml or application.properties .
 eureka:
   instance:
