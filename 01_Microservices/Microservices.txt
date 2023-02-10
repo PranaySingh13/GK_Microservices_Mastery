@@ -529,16 +529,16 @@ spring:
 	13.3 default-label – Branch that configurations server should check for configurations.
 	13.4 In addition to that if you are using a private repository just use spring.cloud.config.server.git.username and spring.cloud.config.server.git.password to set authentication.
 	13.5 After configuring all the things just start the service as a spring boot application. Then you can check all the things by accessing the following URLs.
-	  Ex:- 	http://localhost:8090/application/default
+	  Ex:- 	http://localhost:8085/application/default
 		This loads all the configurations inside default property file of config microservice.
-		http://localhost:8090/application/dev
+		http://localhost:8085/application/dev
 		This will return all the configuraration under DEV profile along with default profile. In spring boot it will automatically give priority to DEV profile, when run with DEV profile.
 
 14. Now we have a working configuration server, Then let’s focus on configuring microservices to use configuration server in order to load application configurations.
 
 15. Configure Microservices with Config Client
 Let’s focus on how to set up microservices inside our architecture to consume the configurations server and capture all the application properties when deploying the application.
-16. Here I’ll demonstrate the approach with api-gateway and the process is the same for every and each other client service inside the architecture.
+16. Here I’ll demonstrate the approach with api-gateway and the process is the same for each and every other client service inside the architecture.
 17. First, we should include dependencies Config Client from spring initializer into the Client including api-gateway that connects to a Spring Cloud Config Server to fetch the application's configuration.
     <dependency>
       <groupId>org.springframework.cloud</groupId>
@@ -550,13 +550,13 @@ spring:
   config:
     import: optional:configserver:http://localhost:8085
 
-18. After that create bootstrap.yml inside src/main/resources and add the following configurations which this application connect with the configuration server which we have configured earlier.
+18. After that create bootstrap.yml inside src/main/resources in api-gateway and add the following configurations which this application connect with the configuration server which we have configured earlier.
 spring:
   cloud:
     config:
       uri: http://localhost:8085
 	
-19. Finally, remove all the local configurations from application.yml or application.properties .
+19. Finally, remove all the local configurations from application.yml or application.properties of client services.
 eureka:
   instance:
     ip-address: true
